@@ -1,0 +1,14 @@
+notifications:
+  console_enabled: true
+  email_enabled: false
+  email_password: your-app-password
+  email_recipients:
+  - admin@company.com
+  - devops@company.com
+  email_smtp_port: 587
+  email_smtp_server: smtp.gmail.com
+  email_username: your-email@company.com
+  slack_enabled: false
+  slack_webhook_url: https://hooks.slack.com/services/...
+  teams_enabled: false
+  teams_webhook_url: https://your-company.webhook.office.com/...

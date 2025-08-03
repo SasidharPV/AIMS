@@ -1,0 +1,29 @@
+system:
+  app_name: ADF Monitor Pro
+  backup_retention_days: 90
+  database_url: sqlite:///adf_monitor_enterprise.db
+  enable_audit_trail: true
+  enable_performance_monitoring: true
+  log_file: logs/adf_monitor.log
+  log_level: INFO
+  max_concurrent_users: 50
+  monitoring:
+    enable_health_checks: true
+    enable_metrics_collection: true
+    health_check_interval: 60
+    metrics_retention_days: 30
+  security:
+    enable_authentication: true
+    enable_rbac: true
+    password_policy:
+      min_length: 8
+      require_lowercase: true
+      require_numbers: true
+      require_special_chars: true
+      require_uppercase: true
+    session_security:
+      enable_csrf_protection: true
+      same_site: strict
+      secure_cookies: true
+  session_timeout_hours: 8
+  version: 2.0.0

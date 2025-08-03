@@ -1,0 +1,234 @@
+{
+  "pipeline_runs": [
+    {
+      "runId": "mock-run-2eaf9496",
+      "pipelineName": "DataProcessingPipeline",
+      "status": "Succeeded",
+      "runStart": "2025-08-03T12:14:16.354024Z",
+      "runEnd": "2025-08-03T13:14:16.354024Z",
+      "message": null
+    },
+    {
+      "runId": "mock-run-65c5889d",
+      "pipelineName": "ETLPipeline",
+      "status": "Failed",
+      "runStart": "2025-08-03T11:48:52.354024Z",
+      "runEnd": "2025-08-03T11:56:52.354024Z",
+      "message": "Duplicate key violation: Primary key constraint failed"
+    },
+    {
+      "runId": "mock-run-1670f6f2",
+      "pipelineName": "CustomerDataPipeline",
+      "status": "Succeeded",
+      "runStart": "2025-08-03T12:37:05.354024Z",
+      "runEnd": "2025-08-03T13:29:05.354024Z",
+      "message": null
+    },
+    {
+      "runId": "mock-run-7401a4bd",
+      "pipelineName": "DataValidationPipeline",
+      "status": "Succeeded",
+      "runStart": "2025-08-03T11:42:47.354024Z",
+      "runEnd": "2025-08-03T12:06:47.354024Z",
+      "message": null
+    },
+    {
+      "runId": "mock-run-35a7f7a4",
+      "pipelineName": "DataProcessingPipeline",
+      "status": "Succeeded",
+      "runStart": "2025-08-03T13:35:48.355027Z",
+      "runEnd": "2025-08-03T14:12:48.355027Z",
+      "message": null
+    },
+    {
+      "runId": "mock-run-8a4248ca",
+      "pipelineName": "CustomerDataPipeline",
+      "status": "Failed",
+      "runStart": "2025-08-03T12:48:10.355027Z",
+      "runEnd": "2025-08-03T13:13:10.355027Z",
+      "message": "Service temporarily unavailable. Please retry after some time"
+    },
+    {
+      "runId": "mock-run-65b570e0",
+      "pipelineName": "ETLPipeline",
+      "status": "Failed",
+      "runStart": "2025-08-03T12:07:08.355027Z",
+      "runEnd": "2025-08-03T12:11:08.355027Z",
+      "message": "Data type mismatch: Expected INTEGER but found STRING in column 'amount'"
+    },
+    {
+      "runId": "mock-run-7403b375",
+      "pipelineName": "DataValidationPipeline",
+      "status": "Failed",
+      "runStart": "2025-08-03T13:18:09.355027Z",
+      "runEnd": "2025-08-03T13:48:09.355027Z",
+      "message": "Validation failed: Missing required column 'customer_id' in source file"
+    },
+    {
+      "runId": "mock-run-38834645",
+      "pipelineName": "DataValidationPipeline",
+      "status": "Succeeded",
+      "runStart": "2025-08-03T12:32:30.355027Z",
+      "runEnd": "2025-08-03T13:04:30.355027Z",
+      "message": null
+    },
+    {
+      "runId": "mock-run-ff1d4d26",
+      "pipelineName": "ETLPipeline",
+      "status": "Succeeded",
+      "runStart": "2025-08-03T11:55:49.355027Z",
+      "runEnd": "2025-08-03T12:06:49.355027Z",
+      "message": null
+    },
+    {
+      "runId": "mock-run-a1aa05a9",
+      "pipelineName": "DataProcessingPipeline",
+      "status": "Failed",
+      "runStart": "2025-08-03T12:02:54.355027Z",
+      "runEnd": "2025-08-03T12:21:54.355027Z",
+      "message": "Validation failed: Missing required column 'customer_id' in source file"
+    },
+    {
+      "runId": "mock-run-87940878",
+      "pipelineName": "ReportGenerationPipeline",
+      "status": "Failed",
+      "runStart": "2025-08-03T12:39:51.355027Z",
+      "runEnd": "2025-08-03T12:44:51.355027Z",
+      "message": "Service temporarily unavailable. Please retry after some time"
+    },
+    {
+      "runId": "mock-run-523106a5",
+      "pipelineName": "CustomerDataPipeline",
+      "status": "Succeeded",
+      "runStart": "2025-08-03T12:47:00.355027Z",
+      "runEnd": "2025-08-03T13:41:00.355027Z",
+      "message": null
+    },
+    {
+      "runId": "mock-run-f5a6a1e8",
+      "pipelineName": "SalesAnalyticsPipeline",
+      "status": "Succeeded",
+      "runStart": "2025-08-03T12:13:58.355027Z",
+      "runEnd": "2025-08-03T12:53:58.355027Z",
+      "message": null
+    },
+    {
+      "runId": "mock-run-a1d249ea",
+      "pipelineName": "ReportGenerationPipeline",
+      "status": "Succeeded",
+      "runStart": "2025-08-03T12:08:58.355027Z",
+      "runEnd": "2025-08-03T13:01:58.355027Z",
+      "message": null
+    },
+    {
+      "runId": "mock-run-0efb651f",
+      "pipelineName": "ReportGenerationPipeline",
+      "status": "Succeeded",
+      "runStart": "2025-08-03T13:13:22.355027Z",
+      "runEnd": "2025-08-03T14:07:22.355027Z",
+      "message": null
+    },
+    {
+      "runId": "mock-run-e8cedcf3",
+      "pipelineName": "DataValidationPipeline",
+      "status": "Succeeded",
+      "runStart": "2025-08-03T13:21:38.355027Z",
+      "runEnd": "2025-08-03T14:09:38.355027Z",
+      "message": null
+    },
+    {
+      "runId": "mock-run-25424216",
+      "pipelineName": "SalesAnalyticsPipeline",
+      "status": "Failed",
+      "runStart": "2025-08-03T13:07:00.355027Z",
+      "runEnd": "2025-08-03T13:33:00.355027Z",
+      "message": "Duplicate key violation: Primary key constraint failed"
+    },
+    {
+      "runId": "mock-run-c21d9579",
+      "pipelineName": "SalesAnalyticsPipeline",
+      "status": "Failed",
+      "runStart": "2025-08-03T12:43:59.355027Z",
+      "runEnd": "2025-08-03T12:47:59.355027Z",
+      "message": "Resource not found: Storage container 'data-input' does not exist"
+    },
+    {
+      "runId": "mock-run-79a563d4",
+      "pipelineName": "DataValidationPipeline",
+      "status": "Failed",
+      "runStart": "2025-08-03T13:11:33.355027Z",
+      "runEnd": "2025-08-03T13:26:33.355027Z",
+      "message": "Access denied: Insufficient permissions to read from storage account"
+    }
+  ],
+  "genai_responses": {
+    "transient_network": {
+      "error_type": "transient",
+      "severity": "medium",
+      "should_retry": true,
+      "retry_delay_minutes": 10,
+      "confidence_score": 85,
+      "analysis_summary": "Network timeout detected. This is a transient connectivity issue that typically resolves on retry.",
+      "root_cause": "Temporary network connectivity or service availability issue",
+      "recommended_actions": [
+        "Retry the pipeline execution",
+        "Monitor network connectivity",
+        "Check Azure service health status",
+        "Consider increasing timeout values if pattern persists"
+      ],
+      "manual_intervention_required": false
+    },
+    "data_quality_schema": {
+      "error_type": "data_quality",
+      "severity": "high",
+      "should_retry": false,
+      "retry_delay_minutes": 0,
+      "confidence_score": 92,
+      "analysis_summary": "Schema validation failure detected. Source data structure has changed and requires manual review.",
+      "root_cause": "Data schema mismatch or missing required columns",
+      "recommended_actions": [
+        "Review source data schema changes",
+        "Update pipeline to handle new schema",
+        "Contact data provider about schema changes",
+        "Implement schema evolution handling",
+        "Add data validation steps"
+      ],
+      "manual_intervention_required": true
+    },
+    "configuration_access": {
+      "error_type": "configuration",
+      "severity": "high",
+      "should_retry": false,
+      "retry_delay_minutes": 0,
+      "confidence_score": 88,
+      "analysis_summary": "Access denied error indicates authentication or authorization configuration issue.",
+      "root_cause": "Invalid credentials or insufficient permissions",
+      "recommended_actions": [
+        "Verify service principal credentials",
+        "Check resource access permissions",
+        "Review connection string configuration",
+        "Validate storage account access rights",
+        "Update authentication settings"
+      ],
+      "manual_intervention_required": true
+    },
+    "unknown_error": {
+      "error_type": "unknown",
+      "severity": "medium",
+      "should_retry": true,
+      "retry_delay_minutes": 15,
+      "confidence_score": 65,
+      "analysis_summary": "Unable to classify error definitively. Recommending cautious retry with monitoring.",
+      "root_cause": "Error pattern not recognized in training data",
+      "recommended_actions": [
+        "Attempt one retry with careful monitoring",
+        "Review detailed activity logs",
+        "Check for similar patterns in history",
+        "Escalate to support if retry fails",
+        "Consider adding to error pattern training"
+      ],
+      "manual_intervention_required": false
+    }
+  },
+  "generated_at": "2025-08-03T13:41:52.355027"
+}

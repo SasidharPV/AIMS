@@ -1,0 +1,26 @@
+[
+  {
+    "runId": "test-transient-001",
+    "pipelineName": "DataProcessingPipeline",
+    "status": "Failed",
+    "runStart": "2025-08-03T13:31:52.365025Z",
+    "runEnd": "2025-08-03T13:36:52.365025Z",
+    "message": "Activity 'CopyData' failed: The source database connection failed due to timeout. Error code: 40001"
+  },
+  {
+    "runId": "test-data-quality-001",
+    "pipelineName": "ETLPipeline",
+    "status": "Failed",
+    "runStart": "2025-08-03T13:21:52.365025Z",
+    "runEnd": "2025-08-03T13:26:52.365025Z",
+    "message": "Validation failed: Missing required column 'customer_id' in source file. This is likely a data quality issue."
+  },
+  {
+    "runId": "test-config-001",
+    "pipelineName": "CustomerDataPipeline",
+    "status": "Failed",
+    "runStart": "2025-08-03T13:11:52.365025Z",
+    "runEnd": "2025-08-03T13:16:52.365025Z",
+    "message": "Access denied: Insufficient permissions to read from storage account 'customerdata'"
+  }
+]

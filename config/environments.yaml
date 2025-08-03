@@ -1,0 +1,23 @@
+environments:
+- client_id: your-client-id
+  client_secret: your-client-secret
+  data_factory: prod-adf-main
+  name: Production
+  polling_interval: 300
+  region: eastus
+  resource_group: prod-rg-adf
+  retry_attempts: 3
+  status: Active
+  subscription_id: your-prod-subscription-id
+  tenant_id: your-tenant-id
+- client_id: your-client-id
+  client_secret: your-client-secret
+  data_factory: stage-adf-main
+  name: Staging
+  polling_interval: 600
+  region: eastus
+  resource_group: stage-rg-adf
+  retry_attempts: 2
+  status: Active
+  subscription_id: your-stage-subscription-id
+  tenant_id: your-tenant-id

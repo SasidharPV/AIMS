@@ -1,0 +1,27 @@
+ai_providers:
+- active: true
+  api_endpoint: https://api.openai.com/v1/chat/completions
+  api_key: your-openai-api-key
+  confidence_threshold: 75
+  cost_per_1k_tokens: 0.03
+  frequency_penalty: 0.0
+  max_tokens: 1000
+  model_name: gpt-4
+  provider_id: openai-gpt4
+  provider_name: OpenAI GPT-4
+  retry_confidence: 80
+  temperature: 0.3
+  top_p: 0.9
+- active: false
+  api_endpoint: https://your-resource.openai.azure.com/
+  api_key: your-azure-openai-key
+  confidence_threshold: 75
+  cost_per_1k_tokens: 0.02
+  frequency_penalty: 0.0
+  max_tokens: 1000
+  model_name: gpt-4
+  provider_id: azure-openai
+  provider_name: Azure OpenAI
+  retry_confidence: 80
+  temperature: 0.3
+  top_p: 0.9
