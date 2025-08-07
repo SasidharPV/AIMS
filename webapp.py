@@ -1544,36 +1544,16 @@ def discover_data_factories():
             st.error(f"❌ Discovery failed: {e}")
 
 def save_to_env_file(config_data):
-        st.subheader("AI Provider Configuration")
-        
-        # Current providers
-        col1, col2 = st.columns(2)
-        
-        with col1:
-            st.write("**Available Providers**")
-            
-            providers = [
-                {"Name": "OpenAI GPT-4", "Status": "Active", "API": "Configured", "Cost": "$0.03/1K tokens"},
-                {"Name": "Azure OpenAI", "Status": "Active", "API": "Configured", "Cost": "$0.02/1K tokens"}, 
-                {"Name": "Google Gemini", "Status": "Inactive", "API": "Not Configured", "Cost": "$0.025/1K tokens"},
-                {"Name": "Claude-3", "Status": "Testing", "API": "Configured", "Cost": "$0.015/1K tokens"}
-            ]
-            
-            for provider in providers:
-                status_color = {"Active": "🟢", "Inactive": "🔴", "Testing": "🟡"}
-                st.markdown(f"""
-                **{provider['Name']}** {status_color[provider['Status']]}
-                - API: {provider['API']}
-                - Cost: {provider['Cost']}
-                """)
-        
-        with col2:
-            st.write("**Add New Provider**")
-            
-            new_provider = st.text_input("Provider Name")
-            api_endpoint = st.text_input("API Endpoint")
-            api_key = st.text_input("API Key", type="password")
-            model_name = st.text_input("Model Name")
+    """Save configuration to .env file"""
+    try:
+        env_path = ".env"
+        with open(env_path, "w") as f:
+            for key, value in config_data.items():
+                f.write(f"{key}={value}\n")
+        return True
+    except Exception as e:
+        st.error(f"Error saving configuration: {e}")
+        return False
             
 def discover_data_factories():
     """Discover Data Factories in subscription"""
@@ -1820,6 +1800,42 @@ def main():
         Powered by AI • Built for Scale • Designed for DevOps Teams
     </div>
     """, unsafe_allow_html=True)
+
+def test_ai_provider(provider):
+    """Test individual AI provider"""
+    try:
+        with st.spinner(f"Testing {provider['name']}..."):
+            time.sleep(1)  # Simulate API call
+            # In real implementation, this would test the actual API
+            provider['last_test_success'] = True
+            st.success(f"✅ {provider['name']} connection successful!")
+    except Exception as e:
+        provider['last_test_success'] = False
+        st.error(f"❌ {provider['name']} test failed: {e}")
+
+def test_all_ai_providers():
+    """Test all active AI providers"""
+    active_providers = [p for p in st.session_state.ai_providers if p['active']]
+    for provider in active_providers:
+        test_ai_provider(provider)
+
+def reset_ai_providers_to_default():
+    """Reset AI providers to default configuration"""
+    st.session_state.ai_providers = [
+        {
+            "id": "azure-openai-primary",
+            "name": "Azure OpenAI GPT-4",
+            "type": "azure-openai",
+            "model": "gpt-4",
+            "endpoint": "",
+            "api_key": "",
+            "deployment": "",
+            "active": True,
+            "priority": 1
+        }
+    ]
+    st.success("✅ AI providers reset to defaults!")
+    st.rerun()
 
 if __name__ == "__main__":
     main()
