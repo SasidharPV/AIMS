@@ -16,7 +16,7 @@ Your ADF Monitor Pro web application is now ready for GitHub deployment!
 # Go to GitHub.com and create a new repository named "AIMS"
 # Then run these commands:
 
-git remote add origin https://github.com/YOUR-USERNAME/AIMS.git
+git remote add origin https://github.com/SasidharPV/AIMS.git
 git branch -M main
 git push -u origin main
 ```
@@ -119,7 +119,7 @@ SMTP_PASSWORD=your-app-password
 
 ### Local Development
 ```bash
-git clone https://github.com/YOUR-USERNAME/AIMS.git
+git clone https://github.com/SasidharPV/AIMS.git
 cd AIMS
 pip install -r requirements_webapp.txt
 cp .env.sample .env
@@ -156,8 +156,8 @@ az webapp create \
 
 ## 📞 Support & Community
 
-- 🐛 **Issues**: [GitHub Issues](https://github.com/YOUR-USERNAME/AIMS/issues)
-- 💬 **Discussions**: [GitHub Discussions](https://github.com/YOUR-USERNAME/AIMS/discussions)
+- 🐛 **Issues**: [GitHub Issues](https://github.com/SasidharPV/AIMS/issues)
+- 💬 **Discussions**: [GitHub Discussions](https://github.com/SasidharPV/AIMS/discussions)
 - 📧 **Enterprise Support**: Contact for production deployments
 
 ## 🎉 Ready to Deploy!
@@ -171,7 +171,7 @@ Your ADF Monitor Pro is ready for GitHub!
 4. Share your deployment URL with your team!
 
 **Live URLs will be:**
-- 🌐 **Documentation**: `https://YOUR-USERNAME.github.io/AIMS`
+- 🌐 **Documentation**: `https://SasidharPV.github.io/AIMS`
 - ☁️ **Live App**: Launch via GitHub Codespaces
 - 🐳 **Container**: Deploy using Docker or Azure
 

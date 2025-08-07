@@ -1,7 +1,7 @@
 # 🚀 ADF Monitor Pro - GitHub Deployment Guide
 
-[![Deploy to GitHub Pages](https://github.com/your-username/AIMS/actions/workflows/deploy-webapp.yml/badge.svg)](https://github.com/your-username/AIMS/actions/workflows/deploy-webapp.yml)
-[![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/your-username/AIMS)
+[![Deploy to GitHub Pages](https://github.com/SasidharPV/AIMS/actions/workflows/deploy-webapp.yml/badge.svg)](https://github.com/SasidharPV/AIMS/actions/workflows/deploy-webapp.yml)
+[![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/SasidharPV/AIMS)
 
 **Deploy your ADF Monitor Pro web application to GitHub in minutes!**
 
@@ -37,7 +37,7 @@
 **For customization and development:**
 
 ```bash
-git clone https://github.com/your-username/AIMS.git
+git clone https://github.com/SasidharPV/AIMS.git
 cd AIMS
 pip install -r requirements_webapp.txt
 python startup.py webapp
@@ -50,7 +50,7 @@ python startup.py webapp
 1. **Fork this repository** or **create a new one**
 2. **Clone to your local machine**:
    ```bash
-   git clone https://github.com/your-username/AIMS.git
+   git clone https://github.com/SasidharPV/AIMS.git
    cd AIMS
    ```
 
@@ -58,7 +58,7 @@ python startup.py webapp
 
 1. Go to **Settings** → **Pages**
 2. Select **Source**: GitHub Actions
-3. Your documentation site will be available at: `https://your-username.github.io/AIMS`
+3. Your documentation site will be available at: `https://SasidharPV.github.io/AIMS`
 
 ### Step 3: Enable Codespaces
 
@@ -142,10 +142,10 @@ RBAC and audit logging
 
 ## 🔗 Quick Links
 
-- **Live Demo**: [GitHub Pages Site](https://your-username.github.io/AIMS)
-- **Launch App**: [GitHub Codespaces](https://codespaces.new/your-username/AIMS)
-- **Issues**: [Report Bug](https://github.com/your-username/AIMS/issues)
-- **Discussions**: [Get Help](https://github.com/your-username/AIMS/discussions)
+- **Live Demo**: [GitHub Pages Site](https://SasidharPV.github.io/AIMS)
+- **Launch App**: [GitHub Codespaces](https://codespaces.new/SasidharPV/AIMS)
+- **Issues**: [Report Bug](https://github.com/SasidharPV/AIMS/issues)
+- **Discussions**: [Get Help](https://github.com/SasidharPV/AIMS/discussions)
 
 ## 📞 Support
 
