@@ -338,24 +338,149 @@ def render_sidebar():
     st.sidebar.metric("Auto-Retries Today", 8, "3")
     
     st.sidebar.markdown('</div>', unsafe_allow_html=True)
+    
+    # Multi-Environment Quick Actions
+    st.sidebar.markdown('<div class="sidebar-section">', unsafe_allow_html=True)
+    st.sidebar.subheader("🌍 Quick Environment Actions")
+    
+    if st.sidebar.button("🚨 View All Environment Failures", type="primary"):
+        st.session_state.current_tab = "Failures"
+        # Switch to multi-environment view
+        st.session_state.failure_view_mode = "Multi-Environment Overview"
+        st.rerun()
+    
+    if st.sidebar.button("📊 Cross-Environment Comparison"):
+        st.session_state.current_tab = "Failures"
+        st.session_state.failure_view_mode = "Cross-Environment Comparison" 
+        st.rerun()
+    
+    # Quick environment health indicators
+    st.sidebar.markdown("**Environment Health:**")
+    col1, col2, col3 = st.sidebar.columns(3)
+    with col1:
+        st.markdown("🔴 **Prod**<br/>3 issues", unsafe_allow_html=True)
+    with col2:
+        st.markdown("🟡 **Stage**<br/>1 issue", unsafe_allow_html=True)
+    with col3:
+        st.markdown("🟢 **Dev**<br/>2 issues", unsafe_allow_html=True)
+    
+    st.sidebar.markdown('</div>', unsafe_allow_html=True)
 
 def render_dashboard_page():
     """Render main dashboard"""
-    st.header("📊 Dashboard Overview")
+    st.header("📊 ADF Monitor Pro - Unified Dashboard")
     
-    # Top metrics
+    # Multi-Environment Health Overview
+    st.subheader("🌍 Multi-Environment Health Status")
+    
+    env_health_col1, env_health_col2, env_health_col3, env_health_col4 = st.columns(4)
+    
+    with env_health_col1:
+        st.markdown("### 🔴 Production")
+        prod_health = st.container()
+        with prod_health:
+            st.metric("Pipelines", "45", "-2")
+            st.metric("Success Rate", "92.1%", "-1.2%")
+            st.metric("Active Failures", "3", "+1")
+            st.metric("Critical Issues", "1", "+1")
+            
+            # Status indicator
+            if st.session_state.current_environment == "Production":
+                st.success("🟢 Currently Monitoring")
+            else:
+                if st.button("Switch to Production", key="switch_prod"):
+                    st.session_state.current_environment = "Production"
+                    st.rerun()
+    
+    with env_health_col2:
+        st.markdown("### 🟡 Staging")
+        staging_health = st.container()
+        with staging_health:
+            st.metric("Pipelines", "32", "+1")
+            st.metric("Success Rate", "96.8%", "+0.5%")
+            st.metric("Active Failures", "1", "0")
+            st.metric("Critical Issues", "0", "0")
+            
+            if st.session_state.current_environment == "Staging":
+                st.success("🟢 Currently Monitoring")
+            else:
+                if st.button("Switch to Staging", key="switch_staging"):
+                    st.session_state.current_environment = "Staging"
+                    st.rerun()
+    
+    with env_health_col3:
+        st.markdown("### 🟢 Development")
+        dev_health = st.container()
+        with dev_health:
+            st.metric("Pipelines", "28", "+5")
+            st.metric("Success Rate", "88.4%", "-2.1%")
+            st.metric("Active Failures", "2", "+1")
+            st.metric("Critical Issues", "0", "0")
+            
+            if st.session_state.current_environment == "Development":
+                st.success("🟢 Currently Monitoring")
+            else:
+                if st.button("Switch to Development", key="switch_dev"):
+                    st.session_state.current_environment = "Development"
+                    st.rerun()
+    
+    with env_health_col4:
+        st.markdown("### 📊 Global Summary")
+        global_summary = st.container()
+        with global_summary:
+            st.metric("Total Pipelines", "105", "+4")
+            st.metric("Avg Success Rate", "92.4%", "-0.9%")
+            st.metric("Total Failures", "6", "+2")
+            st.metric("Urgent Actions", "1", "+1")
+            
+            # Global actions
+            if st.button("🚨 View All Failures", key="view_all_failures"):
+                st.session_state.current_tab = "Failures"
+                st.rerun()
+    
+    st.divider()
+    
+    # Current Environment Focus
+    current_env = st.session_state.current_environment
+    st.subheader(f"🎯 Current Focus: {current_env} Environment")
+    
+    # Top metrics for current environment
     col1, col2, col3, col4, col5 = st.columns(5)
     
     with col1:
-        st.metric("Total Pipelines", "127", "12")
+        env_pipeline_count = {"Production": 45, "Staging": 32, "Development": 28}
+        st.metric("Pipelines", env_pipeline_count[current_env], "12")
     with col2:
-        st.metric("Running Now", "3", "1")
+        env_success_rates = {"Production": "92.1%", "Staging": "96.8%", "Development": "88.4%"}
+        st.metric("Success Rate (24h)", env_success_rates[current_env], "2.1%")
     with col3:
-        st.metric("Failed (24h)", "8", "-2")
+        env_failures = {"Production": 3, "Staging": 1, "Development": 2}
+        st.metric("Active Failures", env_failures[current_env], "+1")
     with col4:
-        st.metric("Success Rate", "94.2%", "2.1%")
+        env_retries = {"Production": 8, "Staging": 3, "Development": 5}
+        st.metric("Auto Retries (24h)", env_retries[current_env], "-2")
     with col5:
-        st.metric("Avg Duration", "23min", "-5min")
+        env_ai_actions = {"Production": 15, "Staging": 7, "Development": 12}
+        st.metric("AI Actions", env_ai_actions[current_env], "+3")
+    
+    # Cross-Environment Alerts
+    st.subheader("🚨 Cross-Environment Alerts")
+    
+    alert_col1, alert_col2 = st.columns(2)
+    
+    with alert_col1:
+        st.error("🔴 **CRITICAL**: Production ETLTransformPipeline failure requires immediate attention")
+        st.warning("🟡 **WARNING**: Staging deployment pending - may affect Production release")
+        st.info("ℹ️ **INFO**: Development environment has 2 experimental pipelines running")
+    
+    with alert_col2:
+        st.markdown("**Recent Cross-Environment Events:**")
+        st.markdown("• 🔄 **10:30** - Auto-retry successful in Production")
+        st.markdown("• 📝 **10:15** - New pipeline deployed to Staging")
+        st.markdown("• ⚠️ **09:45** - Permission issue detected across all environments")
+        st.markdown("• ✅ **09:30** - Global health check completed")
+    
+    st.divider()
     
     # Charts
     col1, col2 = st.columns(2)
@@ -407,8 +532,297 @@ def render_dashboard_page():
         """, unsafe_allow_html=True)
 
 def render_failures_page():
-    """Render failures analysis page"""
+    """Render failures analysis page with multi-environment support"""
     st.header("❌ Pipeline Failures Analysis")
+    
+    # Check if view mode is set from sidebar navigation
+    if hasattr(st.session_state, 'failure_view_mode'):
+        default_view = st.session_state.failure_view_mode
+        # Clear the session state after using it
+        del st.session_state.failure_view_mode
+    else:
+        default_view = "Single Environment"
+    
+    # Environment View Toggle
+    view_mode = st.radio(
+        "View Mode",
+        ["Single Environment", "Multi-Environment Overview", "Cross-Environment Comparison"],
+        index=["Single Environment", "Multi-Environment Overview", "Cross-Environment Comparison"].index(default_view),
+        horizontal=True
+    )
+    
+    if view_mode == "Multi-Environment Overview":
+        render_multi_env_failures()
+    elif view_mode == "Cross-Environment Comparison":
+        render_cross_env_comparison()
+    else:
+        render_single_env_failures()
+
+def render_multi_env_failures():
+    """Render failures from all environments on one page"""
+    st.subheader("🌍 All Environments - Current Failures")
+    
+    # Quick stats across all environments
+    col1, col2, col3, col4 = st.columns(4)
+    
+    with col1:
+        st.metric("Production Failures", "3", "-1")
+    with col2:
+        st.metric("Staging Failures", "1", "+1") 
+    with col3:
+        st.metric("Development Failures", "2", "0")
+    with col4:
+        st.metric("Total Active Failures", "6", "0")
+    
+    # Environment color coding
+    env_colors = {
+        "Production": "🔴",
+        "Staging": "🟡", 
+        "Development": "🟢"
+    }
+    
+    # Consolidated failure data from all environments
+    all_failures = [
+        {
+            "environment": "Production",
+            "run_id": "prod-run-001",
+            "pipeline": "DataIngestionPipeline",
+            "error_type": "transient", 
+            "confidence": 85,
+            "severity": "High",
+            "error_message": "Connection timeout to source database",
+            "timestamp": datetime.now() - timedelta(minutes=30),
+            "ai_analysis": "Network connectivity issue detected. Retry recommended.",
+            "status": "Auto-retrying",
+            "retry_count": "2/3"
+        },
+        {
+            "environment": "Production",
+            "run_id": "prod-run-002", 
+            "pipeline": "ETLTransformPipeline",
+            "error_type": "data_quality",
+            "confidence": 92,
+            "severity": "Critical",
+            "error_message": "Schema validation failed: Missing column 'customer_id'",
+            "timestamp": datetime.now() - timedelta(hours=2),
+            "ai_analysis": "Data schema mismatch detected. Manual intervention required.",
+            "status": "Needs Review",
+            "retry_count": "0/3"
+        },
+        {
+            "environment": "Production",
+            "run_id": "prod-run-003",
+            "pipeline": "ReportGenerationPipeline", 
+            "error_type": "configuration",
+            "confidence": 88,
+            "severity": "Medium",
+            "error_message": "Access denied: Insufficient permissions",
+            "timestamp": datetime.now() - timedelta(hours=4),
+            "ai_analysis": "Authentication/authorization issue. Check service principal permissions.",
+            "status": "Manual Fix Required",
+            "retry_count": "1/3"
+        },
+        {
+            "environment": "Staging",
+            "run_id": "stg-run-001",
+            "pipeline": "DataValidationPipeline",
+            "error_type": "transient",
+            "confidence": 78,
+            "severity": "Low",
+            "error_message": "Temporary storage account access issue",
+            "timestamp": datetime.now() - timedelta(minutes=45),
+            "ai_analysis": "Storage throttling detected. Automatic retry scheduled.",
+            "status": "Queued for Retry",
+            "retry_count": "1/3"
+        },
+        {
+            "environment": "Development",
+            "run_id": "dev-run-001",
+            "pipeline": "TestPipeline",
+            "error_type": "configuration",
+            "confidence": 95,
+            "severity": "Low",
+            "error_message": "Invalid connection string format",
+            "timestamp": datetime.now() - timedelta(hours=1),
+            "ai_analysis": "Configuration error in dev environment. Quick fix available.",
+            "status": "Dev Issue",
+            "retry_count": "0/3"
+        },
+        {
+            "environment": "Development", 
+            "run_id": "dev-run-002",
+            "pipeline": "DataQualityPipeline",
+            "error_type": "data_quality",
+            "confidence": 83,
+            "severity": "Medium",
+            "error_message": "Test data contains invalid date formats",
+            "timestamp": datetime.now() - timedelta(hours=3),
+            "ai_analysis": "Test data quality issue. Safe to ignore in dev environment.",
+            "status": "Under Investigation",
+            "retry_count": "0/3"
+        }
+    ]
+    
+    # Filters for multi-environment view
+    filter_col1, filter_col2, filter_col3, filter_col4 = st.columns(4)
+    
+    with filter_col1:
+        env_filter = st.multiselect(
+            "Environments", 
+            ["Production", "Staging", "Development"],
+            default=["Production", "Staging", "Development"]
+        )
+    with filter_col2:
+        severity_filter = st.multiselect(
+            "Severity",
+            ["Critical", "High", "Medium", "Low"],
+            default=["Critical", "High", "Medium", "Low"]
+        )
+    with filter_col3:
+        status_filter = st.multiselect(
+            "Status",
+            ["Auto-retrying", "Needs Review", "Manual Fix Required", "Queued for Retry", "Dev Issue", "Under Investigation"],
+            default=["Auto-retrying", "Needs Review", "Manual Fix Required"]
+        )
+    with filter_col4:
+        time_filter = st.selectbox("Time Range", ["Last Hour", "Last 6 Hours", "Last 24 Hours", "Last Week"])
+    
+    # Filter failures based on selections
+    filtered_failures = [
+        f for f in all_failures 
+        if f["environment"] in env_filter 
+        and f["severity"] in severity_filter 
+        and f["status"] in status_filter
+    ]
+    
+    # Sort by severity and timestamp
+    severity_order = {"Critical": 0, "High": 1, "Medium": 2, "Low": 3}
+    filtered_failures.sort(key=lambda x: (severity_order[x["severity"]], x["timestamp"]), reverse=True)
+    
+    st.markdown(f"**Showing {len(filtered_failures)} failures across {len(env_filter)} environments**")
+    
+    # Display failures in a unified table
+    if filtered_failures:
+        for failure in filtered_failures:
+            severity_color = {
+                "Critical": "🔴",
+                "High": "🟠", 
+                "Medium": "🟡",
+                "Low": "🟢"
+            }
+            
+            with st.expander(
+                f"{env_colors[failure['environment']]} {severity_color[failure['severity']]} "
+                f"**{failure['environment']}** | {failure['pipeline']} | {failure['timestamp'].strftime('%H:%M:%S')} | "
+                f"**{failure['severity']}** | {failure['status']}"
+            ):
+                # Environment-specific styling
+                env_style = {
+                    "Production": "background-color: #ffebee; border-left: 4px solid #f44336;",
+                    "Staging": "background-color: #fff3e0; border-left: 4px solid #ff9800;",
+                    "Development": "background-color: #e8f5e8; border-left: 4px solid #4caf50;"
+                }
+                
+                st.markdown(f'<div style="{env_style[failure["environment"]]} padding: 10px; border-radius: 5px; margin: 5px 0;">', unsafe_allow_html=True)
+                
+                detail_col1, detail_col2, detail_col3 = st.columns([1, 2, 1])
+                
+                with detail_col1:
+                    st.write(f"**Environment:** {failure['environment']}")
+                    st.write(f"**Run ID:** {failure['run_id']}")
+                    st.write(f"**Error Type:** {failure['error_type']}")
+                    st.write(f"**AI Confidence:** {failure['confidence']}%")
+                    st.write(f"**Retry Status:** {failure['retry_count']}")
+                
+                with detail_col2:
+                    st.write(f"**Error Message:**")
+                    st.code(failure['error_message'])
+                    st.write(f"**AI Analysis:**")
+                    st.info(failure['ai_analysis'])
+                
+                with detail_col3:
+                    st.write(f"**Severity:** {failure['severity']}")
+                    st.write(f"**Status:** {failure['status']}")
+                    st.write(f"**Time:** {failure['timestamp'].strftime('%Y-%m-%d %H:%M:%S')}")
+                    
+                    # Environment-specific actions
+                    if failure['environment'] == 'Production':
+                        if st.button(f"🚨 Escalate", key=f"escalate_{failure['run_id']}"):
+                            st.error("Production issue escalated to on-call team!")
+                    
+                    if st.button(f"🔄 Force Retry", key=f"retry_{failure['run_id']}"):
+                        st.success(f"Retry initiated for {failure['pipeline']} in {failure['environment']}")
+                    
+                    if st.button(f"📝 Add Note", key=f"note_{failure['run_id']}"):
+                        st.text_area("Note:", key=f"note_input_{failure['run_id']}", height=100)
+                
+                st.markdown('</div>', unsafe_allow_html=True)
+    else:
+        st.success("🎉 No failures found matching the current filters!")
+
+def render_cross_env_comparison():
+    """Render side-by-side comparison of failures across environments"""
+    st.subheader("🔄 Cross-Environment Comparison")
+    
+    env_col1, env_col2, env_col3 = st.columns(3)
+    
+    environments = ["Production", "Staging", "Development"]
+    env_data = {
+        "Production": {
+            "total_failures": 3,
+            "critical": 1,
+            "high": 1, 
+            "medium": 1,
+            "auto_retrying": 1,
+            "manual_required": 2
+        },
+        "Staging": {
+            "total_failures": 1,
+            "critical": 0,
+            "high": 0,
+            "medium": 0, 
+            "low": 1,
+            "auto_retrying": 1,
+            "manual_required": 0
+        },
+        "Development": {
+            "total_failures": 2,
+            "critical": 0,
+            "high": 0,
+            "medium": 1,
+            "low": 1,
+            "auto_retrying": 0,
+            "manual_required": 1
+        }
+    }
+    
+    for i, env in enumerate(environments):
+        with [env_col1, env_col2, env_col3][i]:
+            data = env_data[env]
+            
+            if env == "Production":
+                st.markdown("### 🔴 Production")
+            elif env == "Staging":
+                st.markdown("### 🟡 Staging") 
+            else:
+                st.markdown("### 🟢 Development")
+            
+            st.metric("Total Failures", data["total_failures"])
+            st.metric("Critical", data.get("critical", 0))
+            st.metric("High", data.get("high", 0))
+            st.metric("Medium", data.get("medium", 0))
+            st.metric("Auto-Retrying", data["auto_retrying"])
+            st.metric("Manual Required", data["manual_required"])
+            
+            # Quick action for each environment
+            if st.button(f"View {env} Details", key=f"view_{env}"):
+                st.session_state.current_environment = env
+                st.rerun()
+
+def render_single_env_failures():
+    """Render failures for the currently selected environment"""
+    current_env = st.session_state.current_environment
+    st.subheader(f"Environment: {current_env}")
     
     # Filters
     col1, col2, col3 = st.columns(3)
