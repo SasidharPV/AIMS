@@ -1,0 +1,222 @@
+{
+  "name": "DataValidationPipeline",
+  "properties": {
+    "description": "Data validation pipeline that simulates transient and configuration errors",
+    "activities": [
+      {
+        "name": "SetValidationParameters",
+        "type": "SetVariable",
+        "dependsOn": [],
+        "typeProperties": {
+          "variableName": "validationRules",
+          "value": [
+            {
+              "ruleName": "CheckNullValues",
+              "query": "SELECT COUNT(*) FROM CustomerStaging WHERE FirstName IS NULL OR LastName IS NULL",
+              "threshold": 0
+            },
+            {
+              "ruleName": "CheckDuplicates",
+              "query": "SELECT COUNT(*) FROM (SELECT CustomerId, COUNT(*) FROM CustomerStaging GROUP BY CustomerId HAVING COUNT(*) > 1) as duplicates",
+              "threshold": 0
+            },
+            {
+              "ruleName": "CheckDataTypes",
+              "query": "SELECT COUNT(*) FROM CustomerStaging WHERE TRY_CAST(CustomerId AS INT) IS NULL",
+              "threshold": 0
+            }
+          ]
+        }
+      },
+      {
+        "name": "RunValidationRules",
+        "type": "ForEach",
+        "dependsOn": [
+          {
+            "activity": "SetValidationParameters",
+            "dependencyConditions": ["Succeeded"]
+          }
+        ],
+        "typeProperties": {
+          "items": {
+            "value": "@variables('validationRules')",
+            "type": "Expression"
+          },
+          "isSequential": true,
+          "activities": [
+            {
+              "name": "SimulateStorageThrottling",
+              "type": "Wait",
+              "policy": {
+                "timeout": "7.00:00:00",
+                "retry": 3,
+                "retryIntervalInSeconds": 45
+              },
+              "typeProperties": {
+                "waitTimeInSeconds": "@if(pipeline().parameters.simulateThrottling, 120, 1)"
+              }
+            },
+            {
+              "name": "ExecuteValidationRule",
+              "type": "Lookup",
+              "dependsOn": [
+                {
+                  "activity": "SimulateStorageThrottling",
+                  "dependencyConditions": ["Succeeded"]
+                }
+              ],
+              "policy": {
+                "timeout": "7.00:00:00",
+                "retry": 2,
+                "retryIntervalInSeconds": 30
+              },
+              "typeProperties": {
+                "source": {
+                  "type": "AzureSqlSource",
+                  "sqlReaderQuery": "@item().query",
+                  "queryTimeout": "02:00:00"
+                },
+                "dataset": {
+                  "referenceName": "SqlCustomerStagingDataset",
+                  "type": "DatasetReference"
+                }
+              }
+            },
+            {
+              "name": "ValidateResult",
+              "type": "IfCondition",
+              "dependsOn": [
+                {
+                  "activity": "ExecuteValidationRule",
+                  "dependencyConditions": ["Succeeded"]
+                }
+              ],
+              "typeProperties": {
+                "expression": {
+                  "value": "@greater(int(activity('ExecuteValidationRule').output.firstRow), item().threshold)",
+                  "type": "Expression"
+                },
+                "ifTrueActivities": [
+                  {
+                    "name": "LogValidationFailure",
+                    "type": "WebActivity",
+                    "policy": {
+                      "timeout": "7.00:00:00",
+                      "retry": 1,
+                      "retryIntervalInSeconds": 30
+                    },
+                    "typeProperties": {
+                      "url": "@pipeline().parameters.loggingEndpoint",
+                      "method": "POST",
+                      "headers": {
+                        "Content-Type": "application/json"
+                      },
+                      "body": {
+                        "pipeline": "@pipeline().Pipeline",
+                        "runId": "@pipeline().RunId",
+                        "ruleName": "@item().ruleName",
+                        "failureCount": "@activity('ExecuteValidationRule').output.firstRow",
+                        "threshold": "@item().threshold",
+                        "status": "VALIDATION_FAILED"
+                      }
+                    }
+                  },
+                  {
+                    "name": "StopOnValidationFailure",
+                    "type": "Fail",
+                    "dependsOn": [
+                      {
+                        "activity": "LogValidationFailure",
+                        "dependencyConditions": ["Completed"]
+                      }
+                    ],
+                    "typeProperties": {
+                      "message": "Validation rule '@{item().ruleName}' failed. Found @{activity('ExecuteValidationRule').output.firstRow} violations, threshold is @{item().threshold}",
+                      "errorCode": "ValidationError"
+                    }
+                  }
+                ],
+                "ifFalseActivities": [
+                  {
+                    "name": "LogValidationSuccess",
+                    "type": "WebActivity",
+                    "policy": {
+                      "timeout": "7.00:00:00",
+                      "retry": 1,
+                      "retryIntervalInSeconds": 30
+                    },
+                    "typeProperties": {
+                      "url": "@pipeline().parameters.loggingEndpoint",
+                      "method": "POST",
+                      "headers": {
+                        "Content-Type": "application/json"
+                      },
+                      "body": {
+                        "pipeline": "@pipeline().Pipeline",
+                        "runId": "@pipeline().RunId",
+                        "ruleName": "@item().ruleName",
+                        "resultCount": "@activity('ExecuteValidationRule').output.firstRow",
+                        "status": "VALIDATION_PASSED"
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      },
+      {
+        "name": "FinalValidationSummary",
+        "type": "WebActivity",
+        "dependsOn": [
+          {
+            "activity": "RunValidationRules",
+            "dependencyConditions": ["Succeeded"]
+          }
+        ],
+        "policy": {
+          "timeout": "7.00:00:00",
+          "retry": 1,
+          "retryIntervalInSeconds": 30
+        },
+        "typeProperties": {
+          "url": "@pipeline().parameters.summaryEndpoint",
+          "method": "POST",
+          "headers": {
+            "Content-Type": "application/json"
+          },
+          "body": {
+            "pipeline": "@pipeline().Pipeline",
+            "runId": "@pipeline().RunId",
+            "totalRules": "@length(variables('validationRules'))",
+            "status": "ALL_VALIDATIONS_PASSED",
+            "timestamp": "@utcnow()"
+          }
+        }
+      }
+    ],
+    "parameters": {
+      "simulateThrottling": {
+        "type": "bool",
+        "defaultValue": false
+      },
+      "loggingEndpoint": {
+        "type": "string",
+        "defaultValue": "https://httpbin.org/post"
+      },
+      "summaryEndpoint": {
+        "type": "string",
+        "defaultValue": "https://httpbin.org/post"
+      }
+    },
+    "variables": {
+      "validationRules": {
+        "type": "Array"
+      }
+    },
+    "folder": {
+      "name": "ValidationPipelines"
+    }
+  }
+}

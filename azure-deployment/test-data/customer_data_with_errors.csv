@@ -1,0 +1,11 @@
+customer_id,first_name,last_name,email,phone,registration_date,status
+1,John,Smith,john.smith@email.com,555-1234,2024-01-15,active
+2,,Johnson,sarah.j@email.com,555-2345,2024-01-16,active
+3,Michael,,m.brown@email.com,555-3456,2024-01-17,active
+4,Emily,Davis,,555-4567,2024-01-18,active
+5,David,Wilson,d.wilson@email.com,,2024-01-19,active
+abc,Lisa,Anderson,lisa.a@email.com,555-6789,2024-01-20,active
+7,Robert,Taylor,rob.taylor@email.com,555-7890,invalid-date,active
+8,Jennifer,Thomas,jen.thomas@email.com,555-8901,2024-01-22,
+1,William,Jackson,w.jackson@email.com,555-9012,2024-01-23,active
+10,Michelle,White,michelle.w@email.com,555-0123,2024-01-24,inactive

@@ -1,0 +1,40 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "environmentName": {
+      "value": "staging"
+    },
+    "resourcePrefix": {
+      "value": "adfmon"
+    },
+    "location": {
+      "value": "East US"
+    },
+    "adminEmail": {
+      "value": "admin@company.com"
+    },
+    "sqlAdminUsername": {
+      "value": "adfadmin"
+    },
+    "sqlAdminPassword": {
+      "value": "StagingPassword123!"
+    },
+    "sku": {
+      "value": {
+        "appService": "S1",
+        "sqlDatabase": "S0",
+        "dataFactory": "Standard",
+        "storageAccount": "Standard_GRS"
+      }
+    },
+    "tags": {
+      "value": {
+        "Environment": "Staging",
+        "Project": "ADF Monitor Pro",
+        "CostCenter": "IT-Staging",
+        "Owner": "QA Team"
+      }
+    }
+  }
+}

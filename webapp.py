@@ -23,53 +23,284 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# Custom CSS for professional styling
-st.markdown("""
-<style>
-.main-header {
-    background: linear-gradient(90deg, #1f4e79 0%, #2e7db8 100%);
-    padding: 1rem;
-    border-radius: 10px;
-    color: white;
-    text-align: center;
-    margin-bottom: 2rem;
-}
-.metric-card {
-    background: white;
-    padding: 1rem;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    border-left: 4px solid #2e7db8;
-}
-.error-card {
-    background: #fff5f5;
-    border: 1px solid #fed7d7;
-    border-radius: 8px;
-    padding: 1rem;
-    margin: 0.5rem 0;
-}
-.success-card {
-    background: #f0fff4;
-    border: 1px solid #9ae6b4;
-    border-radius: 8px;
-    padding: 1rem;
-    margin: 0.5rem 0;
-}
-.warning-card {
-    background: #fffbeb;
-    border: 1px solid #fbd38d;
-    border-radius: 8px;
-    padding: 1rem;
-    margin: 0.5rem 0;
-}
-.sidebar-section {
-    background: #f7fafc;
-    padding: 1rem;
-    border-radius: 8px;
-    margin-bottom: 1rem;
-}
-</style>
-""", unsafe_allow_html=True)
+def apply_theme_styling():
+    """Apply theme-specific CSS styling based on user selection"""
+    # Get current theme from session state, default to Dark if not set
+    theme = st.session_state.get('ui_theme', 'Dark')
+    
+    if theme == 'Light':
+        # Light theme styling
+        st.markdown("""
+        <style>
+        /* Light Theme Styling */
+        .stApp {
+            background-color: #ffffff;
+            color: #1a202c;
+        }
+        
+        .main-header {
+            background: linear-gradient(90deg, #4299e1 0%, #3182ce 100%);
+            padding: 1.5rem;
+            border-radius: 12px;
+            color: white;
+            text-align: center;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 6px rgba(66, 153, 225, 0.3);
+        }
+        
+        .metric-card {
+            background: #ffffff;
+            padding: 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            border-left: 4px solid #4299e1;
+            border: 1px solid #e2e8f0;
+        }
+        
+        .error-card {
+            background: #fef5e7;
+            border: 1px solid #f6ad55;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin: 0.5rem 0;
+            box-shadow: 0 2px 4px rgba(246, 173, 85, 0.1);
+        }
+        
+        .success-card {
+            background: #f0fff4;
+            border: 1px solid #68d391;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin: 0.5rem 0;
+            box-shadow: 0 2px 4px rgba(104, 211, 145, 0.1);
+        }
+        
+        .warning-card {
+            background: #fffbeb;
+            border: 1px solid #fbd38d;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin: 0.5rem 0;
+            box-shadow: 0 2px 4px rgba(251, 211, 141, 0.1);
+        }
+        
+        .sidebar-section {
+            background: #f7fafc;
+            padding: 1.5rem;
+            border-radius: 12px;
+            margin-bottom: 1rem;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+        }
+        
+        .environment-prod {
+            background: #fef5e7;
+            border-left: 4px solid #e53e3e;
+            padding: 1rem;
+            border-radius: 8px;
+            margin: 5px 0;
+            border: 1px solid #fed7d7;
+        }
+        
+        .environment-staging {
+            background: #fffbeb;
+            border-left: 4px solid #dd6b20;
+            padding: 1rem;
+            border-radius: 8px;
+            margin: 5px 0;
+            border: 1px solid #fbd38d;
+        }
+        
+        .environment-dev {
+            background: #f0fff4;
+            border-left: 4px solid #38a169;
+            padding: 1rem;
+            border-radius: 8px;
+            margin: 5px 0;
+            border: 1px solid #9ae6b4;
+        }
+        
+        /* Streamlit component overrides for light theme */
+        .stSelectbox > div > div > div {
+            background-color: #ffffff;
+            border: 2px solid #e2e8f0;
+            color: #1a202c;
+        }
+        
+        .stButton > button {
+            background-color: #4299e1;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 0.5rem 1rem;
+            transition: all 0.3s ease;
+        }
+        
+        .stButton > button:hover {
+            background-color: #3182ce;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px rgba(66, 153, 225, 0.3);
+        }
+        
+        .stExpander {
+            background-color: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+        }
+        
+        .stAlert {
+            border-radius: 8px;
+        }
+        
+        /* Custom card styles for light theme */
+        .metric-container {
+            background: linear-gradient(135deg, #ffffff 0%, #f7fafc 100%);
+            padding: 1rem;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            border: 1px solid #e2e8f0;
+        }
+        </style>
+        """, unsafe_allow_html=True)
+    
+    else:  # Dark theme
+        # Dark theme styling
+        st.markdown("""
+        <style>
+        /* Dark Theme Styling */
+        .stApp {
+            background-color: #0e1117;
+            color: #fafafa;
+        }
+        
+        .main-header {
+            background: linear-gradient(90deg, #1a202c 0%, #2d3748 100%);
+            padding: 1.5rem;
+            border-radius: 12px;
+            color: #fafafa;
+            text-align: center;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+            border: 1px solid #4a5568;
+        }
+        
+        .metric-card {
+            background: #1a202c;
+            padding: 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+            border-left: 4px solid #4299e1;
+            border: 1px solid #4a5568;
+            color: #fafafa;
+        }
+        
+        .error-card {
+            background: #2d1b1b;
+            border: 1px solid #e53e3e;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin: 0.5rem 0;
+            box-shadow: 0 2px 4px rgba(229, 62, 62, 0.2);
+            color: #fed7d7;
+        }
+        
+        .success-card {
+            background: #1b2d1b;
+            border: 1px solid #38a169;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin: 0.5rem 0;
+            box-shadow: 0 2px 4px rgba(56, 161, 105, 0.2);
+            color: #c6f6d5;
+        }
+        
+        .warning-card {
+            background: #2d2619;
+            border: 1px solid #dd6b20;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin: 0.5rem 0;
+            box-shadow: 0 2px 4px rgba(221, 107, 32, 0.2);
+            color: #fbd38d;
+        }
+        
+        .sidebar-section {
+            background: #1a202c;
+            padding: 1.5rem;
+            border-radius: 12px;
+            margin-bottom: 1rem;
+            border: 1px solid #4a5568;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            color: #fafafa;
+        }
+        
+        .environment-prod {
+            background: #2d1b1b;
+            border-left: 4px solid #e53e3e;
+            padding: 1rem;
+            border-radius: 8px;
+            margin: 5px 0;
+            border: 1px solid #e53e3e;
+            color: #fed7d7;
+        }
+        
+        .environment-staging {
+            background: #2d2619;
+            border-left: 4px solid #dd6b20;
+            padding: 1rem;
+            border-radius: 8px;
+            margin: 5px 0;
+            border: 1px solid #dd6b20;
+            color: #fbd38d;
+        }
+        
+        .environment-dev {
+            background: #1b2d1b;
+            border-left: 4px solid #38a169;
+            padding: 1rem;
+            border-radius: 8px;
+            margin: 5px 0;
+            border: 1px solid #38a169;
+            color: #c6f6d5;
+        }
+        
+        /* Streamlit component overrides for dark theme */
+        .stButton > button {
+            background-color: #4299e1;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 0.5rem 1rem;
+            transition: all 0.3s ease;
+        }
+        
+        .stButton > button:hover {
+            background-color: #3182ce;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px rgba(66, 153, 225, 0.4);
+        }
+        
+        .stExpander {
+            background-color: #1a202c;
+            border: 1px solid #4a5568;
+            border-radius: 8px;
+            color: #fafafa;
+        }
+        
+        /* Custom card styles for dark theme */
+        .metric-container {
+            background: linear-gradient(135deg, #1a202c 0%, #2d3748 100%);
+            padding: 1rem;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.4);
+            border: 1px solid #4a5568;
+            color: #fafafa;
+        }
+        </style>
+        """, unsafe_allow_html=True)
+
+# Apply theme styling
+apply_theme_styling()
 
 # Initialize session state
 if 'current_environment' not in st.session_state:
@@ -248,6 +479,27 @@ def render_sidebar():
     """Render sidebar with controls and configuration"""
     st.sidebar.title("🔧 Control Center")
     
+    # Theme Selection
+    st.sidebar.markdown('<div class="sidebar-section">', unsafe_allow_html=True)
+    st.sidebar.subheader("🎨 Theme")
+    
+    # Initialize theme in session state if not exists
+    if 'ui_theme' not in st.session_state:
+        st.session_state.ui_theme = 'Dark'
+    
+    theme_option = st.sidebar.radio(
+        "Select Theme",
+        options=['Light', 'Dark'],
+        index=['Light', 'Dark'].index(st.session_state.ui_theme),
+        horizontal=True
+    )
+    
+    if theme_option != st.session_state.ui_theme:
+        st.session_state.ui_theme = theme_option
+        st.rerun()
+    
+    st.sidebar.markdown('</div>', unsafe_allow_html=True)
+    
     # Environment Selection
     st.sidebar.markdown('<div class="sidebar-section">', unsafe_allow_html=True)
     st.sidebar.subheader("🌐 Environment")
@@ -376,6 +628,7 @@ def render_dashboard_page():
     env_health_col1, env_health_col2, env_health_col3, env_health_col4 = st.columns(4)
     
     with env_health_col1:
+        st.markdown('<div class="metric-container environment-prod">', unsafe_allow_html=True)
         st.markdown("### 🔴 Production")
         prod_health = st.container()
         with prod_health:
@@ -391,8 +644,10 @@ def render_dashboard_page():
                 if st.button("Switch to Production", key="switch_prod"):
                     st.session_state.current_environment = "Production"
                     st.rerun()
+        st.markdown('</div>', unsafe_allow_html=True)
     
     with env_health_col2:
+        st.markdown('<div class="metric-container environment-staging">', unsafe_allow_html=True)
         st.markdown("### 🟡 Staging")
         staging_health = st.container()
         with staging_health:
@@ -407,8 +662,10 @@ def render_dashboard_page():
                 if st.button("Switch to Staging", key="switch_staging"):
                     st.session_state.current_environment = "Staging"
                     st.rerun()
+        st.markdown('</div>', unsafe_allow_html=True)
     
     with env_health_col3:
+        st.markdown('<div class="metric-container environment-dev">', unsafe_allow_html=True)
         st.markdown("### 🟢 Development")
         dev_health = st.container()
         with dev_health:
@@ -423,8 +680,10 @@ def render_dashboard_page():
                 if st.button("Switch to Development", key="switch_dev"):
                     st.session_state.current_environment = "Development"
                     st.rerun()
+        st.markdown('</div>', unsafe_allow_html=True)
     
     with env_health_col4:
+        st.markdown('<div class="metric-container">', unsafe_allow_html=True)
         st.markdown("### 📊 Global Summary")
         global_summary = st.container()
         with global_summary:
@@ -437,6 +696,7 @@ def render_dashboard_page():
             if st.button("🚨 View All Failures", key="view_all_failures"):
                 st.session_state.current_tab = "Failures"
                 st.rerun()
+        st.markdown('</div>', unsafe_allow_html=True)
     
     st.divider()
     
@@ -716,14 +976,14 @@ def render_multi_env_failures():
                 f"**{failure['environment']}** | {failure['pipeline']} | {failure['timestamp'].strftime('%H:%M:%S')} | "
                 f"**{failure['severity']}** | {failure['status']}"
             ):
-                # Environment-specific styling
-                env_style = {
-                    "Production": "background-color: #ffebee; border-left: 4px solid #f44336;",
-                    "Staging": "background-color: #fff3e0; border-left: 4px solid #ff9800;",
-                    "Development": "background-color: #e8f5e8; border-left: 4px solid #4caf50;"
+                # Environment-specific styling using CSS classes
+                env_class = {
+                    "Production": "environment-prod",
+                    "Staging": "environment-staging", 
+                    "Development": "environment-dev"
                 }
                 
-                st.markdown(f'<div style="{env_style[failure["environment"]]} padding: 10px; border-radius: 5px; margin: 5px 0;">', unsafe_allow_html=True)
+                st.markdown(f'<div class="{env_class[failure["environment"]]}">', unsafe_allow_html=True)
                 
                 detail_col1, detail_col2, detail_col3 = st.columns([1, 2, 1])
                 

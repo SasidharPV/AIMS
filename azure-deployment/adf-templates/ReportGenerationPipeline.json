@@ -1,0 +1,217 @@
+{
+  "name": "ReportGenerationPipeline", 
+  "properties": {
+    "description": "Report generation pipeline with scheduled triggers and failure scenarios",
+    "activities": [
+      {
+        "name": "CheckPermissions",
+        "type": "WebActivity",
+        "dependsOn": [],
+        "policy": {
+          "timeout": "7.00:00:00",
+          "retry": 1,
+          "retryIntervalInSeconds": 30
+        },
+        "typeProperties": {
+          "url": "https://management.azure.com/subscriptions/@{pipeline().parameters.subscriptionId}/resourceGroups/@{pipeline().parameters.resourceGroup}/providers/Microsoft.Storage/storageAccounts/@{pipeline().parameters.storageAccount}?api-version=2021-09-01",
+          "method": "GET",
+          "headers": {
+            "Authorization": "Bearer @{pipeline().parameters.accessToken}"
+          }
+        }
+      },
+      {
+        "name": "GenerateDailySummary",
+        "type": "Lookup",
+        "dependsOn": [
+          {
+            "activity": "CheckPermissions",
+            "dependencyConditions": ["Succeeded"]
+          }
+        ],
+        "policy": {
+          "timeout": "7.00:00:00",
+          "retry": 2,
+          "retryIntervalInSeconds": 30
+        },
+        "typeProperties": {
+          "source": {
+            "type": "AzureSqlSource",
+            "sqlReaderQuery": "SELECT COUNT(*) as TotalCustomers, MAX(CreatedDate) as LastUpdate FROM Customer WHERE CAST(CreatedDate AS DATE) = '@{pipeline().parameters.reportDate}'",
+            "queryTimeout": "02:00:00"
+          },
+          "dataset": {
+            "referenceName": "SqlCustomerProdDataset",
+            "type": "DatasetReference"
+          }
+        }
+      },
+      {
+        "name": "CreateReportData",
+        "type": "ForEach",
+        "dependsOn": [
+          {
+            "activity": "GenerateDailySummary",
+            "dependencyConditions": ["Succeeded"]
+          }
+        ],
+        "typeProperties": {
+          "items": {
+            "value": "@pipeline().parameters.reportTypes",
+            "type": "Expression"
+          },
+          "isSequential": false,
+          "batchCount": 3,
+          "activities": [
+            {
+              "name": "GenerateReport",
+              "type": "Copy",
+              "policy": {
+                "timeout": "7.00:00:00",
+                "retry": 2,
+                "retryIntervalInSeconds": 30
+              },
+              "typeProperties": {
+                "source": {
+                  "type": "AzureSqlSource",
+                  "sqlReaderStoredProcedureName": "[dbo].[GenerateReport]",
+                  "storedProcedureParameters": {
+                    "ReportType": {
+                      "type": "String",
+                      "value": "@item()"
+                    },
+                    "ReportDate": {
+                      "type": "String", 
+                      "value": "@pipeline().parameters.reportDate"
+                    }
+                  },
+                  "queryTimeout": "02:00:00"
+                },
+                "sink": {
+                  "type": "DelimitedTextSink",
+                  "formatSettings": {
+                    "type": "DelimitedTextWriteSettings",
+                    "quoteAllText": true,
+                    "fileExtension": ".csv"
+                  }
+                },
+                "enableStaging": false
+              },
+              "inputs": [
+                {
+                  "referenceName": "SqlReportDataset",
+                  "type": "DatasetReference"
+                }
+              ],
+              "outputs": [
+                {
+                  "referenceName": "ReportCsvDataset",
+                  "type": "DatasetReference",
+                  "parameters": {
+                    "fileName": "@concat(item(), '_', pipeline().parameters.reportDate, '.csv')"
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "name": "SendReportNotification",
+        "type": "WebActivity",
+        "dependsOn": [
+          {
+            "activity": "CreateReportData",
+            "dependencyConditions": ["Succeeded"]
+          }
+        ],
+        "policy": {
+          "timeout": "7.00:00:00",
+          "retry": 1,
+          "retryIntervalInSeconds": 30
+        },
+        "typeProperties": {
+          "url": "@pipeline().parameters.notificationUrl",
+          "method": "POST",
+          "headers": {
+            "Content-Type": "application/json"
+          },
+          "body": {
+            "subject": "Daily Report Generated",
+            "message": "Reports have been successfully generated for @{pipeline().parameters.reportDate}",
+            "reportCount": "@length(pipeline().parameters.reportTypes)",
+            "totalCustomers": "@activity('GenerateDailySummary').output.firstRow.TotalCustomers"
+          }
+        }
+      },
+      {
+        "name": "HandleFailure",
+        "type": "WebActivity",
+        "dependsOn": [
+          {
+            "activity": "CheckPermissions",
+            "dependencyConditions": ["Failed"]
+          },
+          {
+            "activity": "GenerateDailySummary", 
+            "dependencyConditions": ["Failed"]
+          },
+          {
+            "activity": "CreateReportData",
+            "dependencyConditions": ["Failed"]
+          }
+        ],
+        "policy": {
+          "timeout": "7.00:00:00",
+          "retry": 0,
+          "retryIntervalInSeconds": 30
+        },
+        "typeProperties": {
+          "url": "@pipeline().parameters.errorNotificationUrl",
+          "method": "POST", 
+          "headers": {
+            "Content-Type": "application/json"
+          },
+          "body": {
+            "pipeline": "@pipeline().Pipeline",
+            "runId": "@pipeline().RunId",
+            "error": "@if(equals(activity('CheckPermissions').status, 'Failed'), activity('CheckPermissions').error.message, if(equals(activity('GenerateDailySummary').status, 'Failed'), activity('GenerateDailySummary').error.message, activity('CreateReportData').error.message))",
+            "reportDate": "@pipeline().parameters.reportDate",
+            "timestamp": "@utcnow()"
+          }
+        }
+      }
+    ],
+    "parameters": {
+      "reportDate": {
+        "type": "string",
+        "defaultValue": "@formatDateTime(subtractFromTime(utcnow(), 1, 'Day'), 'yyyy-MM-dd')"
+      },
+      "reportTypes": {
+        "type": "array",
+        "defaultValue": ["CustomerSummary", "SalesReport", "InventoryReport"]
+      },
+      "subscriptionId": {
+        "type": "string"
+      },
+      "resourceGroup": {
+        "type": "string"
+      },
+      "storageAccount": {
+        "type": "string"
+      },
+      "accessToken": {
+        "type": "string"
+      },
+      "notificationUrl": {
+        "type": "string"
+      },
+      "errorNotificationUrl": {
+        "type": "string"
+      }
+    },
+    "folder": {
+      "name": "MainPipelines"
+    }
+  }
+}

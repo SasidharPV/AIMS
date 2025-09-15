@@ -1,0 +1,239 @@
+{
+  "name": "ETLTransformPipeline",
+  "properties": {
+    "description": "ETL pipeline with transformation logic and failure scenarios",
+    "activities": [
+      {
+        "name": "CheckDataAvailability",
+        "type": "GetMetadata",
+        "dependsOn": [],
+        "policy": {
+          "timeout": "7.00:00:00",
+          "retry": 3,
+          "retryIntervalInSeconds": 30
+        },
+        "typeProperties": {
+          "dataset": {
+            "referenceName": "ProcessedCsvDataset",
+            "type": "DatasetReference"
+          },
+          "fieldList": ["exists", "size", "lastModified"]
+        }
+      },
+      {
+        "name": "ConditionalTransform",
+        "type": "IfCondition",
+        "dependsOn": [
+          {
+            "activity": "CheckDataAvailability",
+            "dependencyConditions": ["Succeeded"]
+          }
+        ],
+        "typeProperties": {
+          "expression": {
+            "value": "@greater(activity('CheckDataAvailability').output.size, 0)",
+            "type": "Expression"
+          },
+          "ifTrueActivities": [
+            {
+              "name": "TransformData",
+              "type": "Copy",
+              "policy": {
+                "timeout": "7.00:00:00",
+                "retry": 2,
+                "retryIntervalInSeconds": 30
+              },
+              "typeProperties": {
+                "source": {
+                  "type": "DelimitedTextSource",
+                  "formatSettings": {
+                    "type": "DelimitedTextReadSettings"
+                  }
+                },
+                "sink": {
+                  "type": "AzureSqlSink",
+                  "preCopyScript": "TRUNCATE TABLE CustomerStaging",
+                  "writeBehavior": "insert",
+                  "sqlWriterUseTableLock": false
+                },
+                "enableStaging": false,
+                "translator": {
+                  "type": "TabularTranslator",
+                  "mappings": [
+                    {
+                      "source": {
+                        "name": "customer_id",
+                        "type": "String",
+                        "physicalType": "String"
+                      },
+                      "sink": {
+                        "name": "CustomerId",
+                        "type": "Int32",
+                        "physicalType": "int"
+                      }
+                    },
+                    {
+                      "source": {
+                        "name": "first_name", 
+                        "type": "String",
+                        "physicalType": "String"
+                      },
+                      "sink": {
+                        "name": "FirstName",
+                        "type": "String",
+                        "physicalType": "nvarchar"
+                      }
+                    },
+                    {
+                      "source": {
+                        "name": "last_name",
+                        "type": "String", 
+                        "physicalType": "String"
+                      },
+                      "sink": {
+                        "name": "LastName",
+                        "type": "String",
+                        "physicalType": "nvarchar"
+                      }
+                    }
+                  ]
+                }
+              },
+              "inputs": [
+                {
+                  "referenceName": "ProcessedCsvDataset",
+                  "type": "DatasetReference"
+                }
+              ],
+              "outputs": [
+                {
+                  "referenceName": "SqlCustomerDataset",
+                  "type": "DatasetReference"
+                }
+              ]
+            },
+            {
+              "name": "ValidateTransformation",
+              "type": "Lookup",
+              "dependsOn": [
+                {
+                  "activity": "TransformData",
+                  "dependencyConditions": ["Succeeded"]
+                }
+              ],
+              "policy": {
+                "timeout": "7.00:00:00",
+                "retry": 1,
+                "retryIntervalInSeconds": 30
+              },
+              "typeProperties": {
+                "source": {
+                  "type": "AzureSqlSource",
+                  "sqlReaderQuery": "SELECT COUNT(*) as RecordCount FROM CustomerStaging WHERE FirstName IS NULL OR LastName IS NULL",
+                  "queryTimeout": "02:00:00"
+                },
+                "dataset": {
+                  "referenceName": "SqlCustomerDataset",
+                  "type": "DatasetReference"
+                }
+              }
+            },
+            {
+              "name": "CheckDataQuality",
+              "type": "IfCondition",
+              "dependsOn": [
+                {
+                  "activity": "ValidateTransformation",
+                  "dependencyConditions": ["Succeeded"]
+                }
+              ],
+              "typeProperties": {
+                "expression": {
+                  "value": "@equals(activity('ValidateTransformation').output.firstRow.RecordCount, 0)",
+                  "type": "Expression"
+                },
+                "ifTrueActivities": [
+                  {
+                    "name": "MoveToProduction",
+                    "type": "Copy",
+                    "policy": {
+                      "timeout": "7.00:00:00",
+                      "retry": 1,
+                      "retryIntervalInSeconds": 30
+                    },
+                    "typeProperties": {
+                      "source": {
+                        "type": "AzureSqlSource",
+                        "sqlReaderQuery": "SELECT * FROM CustomerStaging",
+                        "queryTimeout": "02:00:00"
+                      },
+                      "sink": {
+                        "type": "AzureSqlSink",
+                        "writeBehavior": "upsert",
+                        "upsertSettings": {
+                          "useTempDB": true,
+                          "keys": ["CustomerId"]
+                        }
+                      },
+                      "enableStaging": false
+                    },
+                    "inputs": [
+                      {
+                        "referenceName": "SqlCustomerStagingDataset",
+                        "type": "DatasetReference"
+                      }
+                    ],
+                    "outputs": [
+                      {
+                        "referenceName": "SqlCustomerProdDataset",
+                        "type": "DatasetReference"
+                      }
+                    ]
+                  }
+                ],
+                "ifFalseActivities": [
+                  {
+                    "name": "FailPipeline",
+                    "type": "Fail",
+                    "typeProperties": {
+                      "message": "Data quality validation failed. Found null values in required fields.",
+                      "errorCode": "DataQualityError"
+                    }
+                  }
+                ]
+              }
+            }
+          ],
+          "ifFalseActivities": [
+            {
+              "name": "NoDataFound",
+              "type": "Fail",
+              "typeProperties": {
+                "message": "No data available for processing",
+                "errorCode": "NoDataError"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "parameters": {
+      "batchDate": {
+        "type": "string",
+        "defaultValue": "@formatDateTime(utcnow(), 'yyyy-MM-dd')"
+      },
+      "simulateFailure": {
+        "type": "bool",
+        "defaultValue": false
+      }
+    },
+    "variables": {
+      "recordCount": {
+        "type": "String"
+      }
+    },
+    "folder": {
+      "name": "MainPipelines"
+    }
+  }
+}

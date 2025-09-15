@@ -1,0 +1,197 @@
+{
+  "name": "DataIngestionPipeline",
+  "properties": {
+    "description": "Main data ingestion pipeline that demonstrates various scenarios",
+    "activities": [
+      {
+        "name": "ValidateSourceData",
+        "type": "Validation",
+        "dependsOn": [],
+        "policy": {
+          "timeout": "7.00:00:00",
+          "retry": 3,
+          "retryIntervalInSeconds": 30
+        },
+        "typeProperties": {
+          "dataset": {
+            "referenceName": "SourceCsvDataset",
+            "type": "DatasetReference"
+          },
+          "timeout": "00:05:00",
+          "sleep": 10
+        }
+      },
+      {
+        "name": "CopyCustomerData",
+        "type": "Copy",
+        "dependsOn": [
+          {
+            "activity": "ValidateSourceData",
+            "dependencyConditions": ["Succeeded"]
+          }
+        ],
+        "policy": {
+          "timeout": "7.00:00:00",
+          "retry": 3,
+          "retryIntervalInSeconds": 30,
+          "secureOutput": false,
+          "secureInput": false
+        },
+        "typeProperties": {
+          "source": {
+            "type": "DelimitedTextSource",
+            "formatSettings": {
+              "type": "DelimitedTextReadSettings",
+              "skipLineCount": 0
+            }
+          },
+          "sink": {
+            "type": "DelimitedTextSink",
+            "formatSettings": {
+              "type": "DelimitedTextWriteSettings",
+              "quoteAllText": true,
+              "fileExtension": ".txt"
+            }
+          },
+          "enableStaging": false,
+          "translator": {
+            "type": "TabularTranslator",
+            "typeConversion": true,
+            "typeConversionSettings": {
+              "allowDataTruncation": true,
+              "treatBooleanAsNumber": false
+            }
+          }
+        },
+        "inputs": [
+          {
+            "referenceName": "SourceCsvDataset",
+            "type": "DatasetReference"
+          }
+        ],
+        "outputs": [
+          {
+            "referenceName": "ProcessedCsvDataset",
+            "type": "DatasetReference"
+          }
+        ]
+      },
+      {
+        "name": "DataQualityCheck",
+        "type": "Custom",
+        "dependsOn": [
+          {
+            "activity": "CopyCustomerData",
+            "dependencyConditions": ["Succeeded"]
+          }
+        ],
+        "policy": {
+          "timeout": "7.00:00:00",
+          "retry": 2,
+          "retryIntervalInSeconds": 30
+        },
+        "typeProperties": {
+          "command": "python",
+          "resourceLinkedService": {
+            "referenceName": "AzureBatchLinkedService",
+            "type": "LinkedServiceReference"
+          },
+          "folderPath": "scripts/",
+          "referenceObjects": {
+            "linkedServices": [],
+            "datasets": [
+              {
+                "referenceName": "ProcessedCsvDataset",
+                "type": "DatasetReference"
+              }
+            ]
+          }
+        }
+      },
+      {
+        "name": "SendSuccessNotification",
+        "type": "WebActivity",
+        "dependsOn": [
+          {
+            "activity": "DataQualityCheck",
+            "dependencyConditions": ["Succeeded"]
+          }
+        ],
+        "policy": {
+          "timeout": "7.00:00:00",
+          "retry": 0,
+          "retryIntervalInSeconds": 30
+        },
+        "typeProperties": {
+          "url": "https://prod-27.northcentralus.logic.azure.com/workflows/.../triggers/manual/paths/invoke",
+          "method": "POST",
+          "headers": {
+            "Content-Type": "application/json"
+          },
+          "body": {
+            "pipeline": "@pipeline().Pipeline",
+            "runId": "@pipeline().RunId",
+            "status": "Success",
+            "message": "Data ingestion completed successfully"
+          }
+        }
+      },
+      {
+        "name": "SendFailureNotification",
+        "type": "WebActivity",
+        "dependsOn": [
+          {
+            "activity": "ValidateSourceData",
+            "dependencyConditions": ["Failed"]
+          },
+          {
+            "activity": "CopyCustomerData", 
+            "dependencyConditions": ["Failed"]
+          },
+          {
+            "activity": "DataQualityCheck",
+            "dependencyConditions": ["Failed"]
+          }
+        ],
+        "policy": {
+          "timeout": "7.00:00:00",
+          "retry": 0,
+          "retryIntervalInSeconds": 30
+        },
+        "typeProperties": {
+          "url": "https://prod-27.northcentralus.logic.azure.com/workflows/.../triggers/manual/paths/invoke",
+          "method": "POST",
+          "headers": {
+            "Content-Type": "application/json"
+          },
+          "body": {
+            "pipeline": "@pipeline().Pipeline",
+            "runId": "@pipeline().RunId",
+            "status": "Failed",
+            "error": "@activity('CopyCustomerData').error.message",
+            "message": "Data ingestion pipeline failed"
+          }
+        }
+      }
+    ],
+    "parameters": {
+      "sourceFileName": {
+        "type": "string",
+        "defaultValue": "customer_data.csv"
+      },
+      "forceFailure": {
+        "type": "bool",
+        "defaultValue": false
+      }
+    },
+    "variables": {
+      "processingDate": {
+        "type": "String",
+        "defaultValue": "@formatDateTime(utcnow(), 'yyyy-MM-dd')"
+      }
+    },
+    "folder": {
+      "name": "MainPipelines"
+    }
+  }
+}

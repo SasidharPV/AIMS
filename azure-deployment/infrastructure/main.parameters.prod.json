@@ -1,0 +1,40 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "environmentName": {
+      "value": "prod"
+    },
+    "resourcePrefix": {
+      "value": "adfmon"
+    },
+    "location": {
+      "value": "East US"
+    },
+    "adminEmail": {
+      "value": "admin@company.com"
+    },
+    "sqlAdminUsername": {
+      "value": "adfadmin"
+    },
+    "sqlAdminPassword": {
+      "value": "ProductionPassword123!"
+    },
+    "sku": {
+      "value": {
+        "appService": "P1V2",
+        "sqlDatabase": "P1",
+        "dataFactory": "Standard",
+        "storageAccount": "Standard_GRS"
+      }
+    },
+    "tags": {
+      "value": {
+        "Environment": "Production",
+        "Project": "ADF Monitor Pro",
+        "CostCenter": "IT-Production",
+        "Owner": "Operations Team"
+      }
+    }
+  }
+}
